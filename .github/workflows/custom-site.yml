@@ -1,0 +1,45 @@
+name: Custom Site CI
+
+# Publishes the custom AIErudit-branded status page (status-site/) to gh-pages,
+# baking in the latest Upptime data (history/summary.json) so the page reads it
+# same-origin. Replaces the default Upptime "Static Site CI" (disabled).
+on:
+  push:
+    branches: [master]
+    paths:
+      - "status-site/**"
+      - "history/summary.json"
+      - ".github/workflows/custom-site.yml"
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: custom-site
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble _site
+        run: |
+          mkdir -p _site
+          cp -r status-site/. _site/
+          cp history/summary.json _site/summary.json
+          echo "status.aierudit.com" > _site/CNAME
+          touch _site/.nojekyll
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "deploy: custom status site"
