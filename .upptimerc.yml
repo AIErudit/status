@@ -1,31 +1,63 @@
-# Change these first
-owner: upptime # Your GitHub organization or username, where this repository lives
-repo: upptime # The name of this repository
+# AIErudit status page — powered by Upptime (GitHub Actions + Issues + Pages).
+# Lives entirely off AIErudit production infra so it stays up during an outage.
+# Docs: https://upptime.js.org/docs/configuration
 
+owner: AIErudit
+repo: status
+
+# -----------------------------------------------------------------------------
+# Monitored components — mirror the customer-facing surfaces of aierudit.com.
+# Each probe was validated against live production before being committed.
+# The prober runs on GitHub's infrastructure, never on our ALB/CloudFront/EC2.
+# -----------------------------------------------------------------------------
 sites:
-  - name: Google
-    url: https://www.google.com
-  - name: Wikipedia
-    url: https://en.wikipedia.org
-  - name: Hacker News
-    url: https://news.ycombinator.com
-  - name: Test Broken Site
-    url: https://thissitedoesnotexist.koj.co
+  - name: Website
+    url: https://aierudit.com/
+    # Public marketing + learner SPA shell (CloudFront -> ALB -> nginx -> app).
+
+  - name: API
+    url: https://aierudit.com/api/health
+    # Backend liveness. Returns 503 if the app is behind on DB migrations.
+
+  - name: Checkout & Payments
+    url: https://aierudit.com/api/v1/health/stripe
+    # Live Stripe reachability. Pre-launch the body is {"status":"disabled"},
+    # which is intentional (payments not enabled yet) and must NOT read as an
+    # outage. Only a genuine Stripe outage returns "unreachable" -> mark down.
+    __dangerous__body_down: '"status":"unreachable"'
+
+  - name: Authentication
+    url: https://aierudit.com/api/v1/auth/providers
+    # Public auth-subsystem signal: enabled OAuth/login providers. 200 = healthy.
+
+  - name: Email Delivery
+    url: https://api.brevo.com/v3/account
+    # Transactional email provider (Brevo) API reachability. 401 = reachable
+    # (no key supplied) and therefore up; a 5xx/timeout = provider outage.
+    expectedStatusCodes:
+      - 200
+      - 401
+
+# Assign auto-opened incident issues to the operator.
+assignees:
+  - vitalybibikov
 
 status-website:
-  # Add your custom domain name, or remove the `cname` line if you don't have a domain
-  # Uncomment the `baseUrl` line if you don't have a custom domain and add your repo name there
-  cname: demo.upptime.js.org
-  # baseUrl: /your-repo-name
-  logoUrl: https://raw.githubusercontent.com/upptime/upptime.js.org/master/static/img/icon.svg
-  name: Upptime
-  introTitle: "**Upptime** is the open-source uptime monitor and status page, powered entirely by GitHub."
-  introMessage: This is a sample status page which uses **real-time** data from our [GitHub repository](https://github.com/upptime/upptime). No server required — just GitHub Actions, Issues, and Pages. [**Get your own for free**](https://github.com/upptime/upptime)
+  cname: status.aierudit.com
+  logoUrl: https://raw.githubusercontent.com/AIErudit/status/master/assets/aierudit-status-logo.png
+  favicon: https://raw.githubusercontent.com/AIErudit/status/master/assets/aierudit-octopus-mark.png
+  name: AIErudit Status
+  introTitle: "**AIErudit Status** — live health of the *Master AI by doing* platform."
+  introMessage: >-
+    Real-time status for [aierudit.com](https://aierudit.com), updated every few
+    minutes by automated checks. This page is hosted independently of AIErudit's
+    own servers, so it stays online even during an incident. The Orchestrator is
+    watching. Questions during an incident? Email
+    [support@aierudit.com](mailto:support@aierudit.com).
   navbar:
     - title: Status
       href: /
-    - title: GitHub
-      href: https://github.com/$OWNER/$REPO
-
-# Upptime also supports notifications, assigning issues, and more
-# See https://upptime.js.org/docs/configuration
+    - title: AIErudit.com
+      href: https://aierudit.com
+    - title: Contact support
+      href: mailto:support@aierudit.com
