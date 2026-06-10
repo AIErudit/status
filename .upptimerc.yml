@@ -38,12 +38,6 @@ sites:
       - 200
       - 401
 
-  - name: QA Synthetic Downtime Probe (temporary)
-    url: https://aierudit.com/api/health
-    # TEMPORARY (step 2/2): same slug as the forced-down probe, now pointed at a
-    # healthy URL so Upptime sees it RECOVER and auto-closes incident #1. Removed
-    # right after to prove the full open->close cycle for #4288.
-
 # Assign auto-opened incident issues to the operator.
 assignees:
   - vitalybibikov
