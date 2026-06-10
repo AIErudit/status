@@ -38,11 +38,6 @@ sites:
       - 200
       - 401
 
-  - name: QA Synthetic Downtime Probe (temporary)
-    url: https://synthetic-downtime-check.aierudit.invalid/
-    # TEMPORARY: a non-resolvable host used once to prove auto-incident
-    # open/close (acceptance criterion for #4288). Removed immediately after.
-
 # Assign auto-opened incident issues to the operator.
 assignees:
   - vitalybibikov
