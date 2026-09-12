@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIErudit Status</title>
+<meta name="description" content="Live system status for AIErudit — Master AI by doing.">
+<meta name="theme-color" content="#0A0F1C">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #F7F9FC; }
+  * { box-sizing: border-box; }
+  #root-loading { min-height: 100vh; display: flex; align-items: center; justify-content: center; font: 13px 'IBM Plex Mono', monospace; color: #94A3B8; }
+  @keyframes px-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .px-float { animation: px-float 1.1s steps(2) infinite; }
+  @keyframes st-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .st-twinkle { animation: st-twinkle 2.2s steps(2) infinite; }
+  @keyframes st-wave { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-9px); } }
+  .st-wave-row { animation: st-wave 2.6s steps(3) infinite; }
+  .st-wave-row.d1 { animation-duration: 3.4s; animation-delay: 0.4s; }
+  .st-wave-row.d2 { animation-duration: 4.2s; animation-delay: 0.9s; }
+  @keyframes st-sail { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(26px); } }
+  .st-sail { animation: st-sail 14s steps(13) infinite; }
+  .st-link { color: #2563EB; text-decoration: none; font-weight: 600; }
+  .st-link:hover { text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) {
+    .px-float, .st-twinkle, .st-wave-row, .st-sail { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"><div id="root-loading">Loading live status…</div></div>
+<script src="./vendor/react.production.min.js"></script>
+<script src="./vendor/react-dom.production.min.js"></script>
+<script src="./app.js"></script>
+</body></html>
