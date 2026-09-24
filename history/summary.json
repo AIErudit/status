@@ -5,15 +5,15 @@
     "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
     "slug": "website",
     "status": "up",
-    "uptime": "99.95%",
+    "uptime": "99.96%",
     "uptimeDay": "100.00%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
-    "uptimeYear": "99.95%",
+    "uptimeYear": "99.96%",
     "time": 866,
     "timeDay": 0,
     "timeWeek": 0,
-    "timeMonth": 887,
+    "timeMonth": 848,
     "timeYear": 866,
     "dailyMinutesDown": {
       "2026-06-23": 68
@@ -33,7 +33,7 @@
     "time": 488,
     "timeDay": 0,
     "timeWeek": 0,
-    "timeMonth": 484,
+    "timeMonth": 441,
     "timeYear": 488,
     "dailyMinutesDown": {}
   },
@@ -51,7 +51,7 @@
     "time": 364,
     "timeDay": 0,
     "timeWeek": 0,
-    "timeMonth": 317,
+    "timeMonth": 324,
     "timeYear": 364,
     "dailyMinutesDown": {
       "2026-08-09": 311
@@ -63,15 +63,15 @@
     "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
     "slug": "authentication",
     "status": "up",
-    "uptime": "99.79%",
+    "uptime": "99.80%",
     "uptimeDay": "100.00%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
-    "uptimeYear": "99.79%",
+    "uptimeYear": "99.80%",
     "time": 315,
     "timeDay": 0,
     "timeWeek": 0,
-    "timeMonth": 296,
+    "timeMonth": 294,
     "timeYear": 315,
     "dailyMinutesDown": {
       "2026-08-09": 311
@@ -91,7 +91,7 @@
     "time": 430,
     "timeDay": 0,
     "timeWeek": 0,
-    "timeMonth": 405,
+    "timeMonth": 392,
     "timeYear": 430,
     "dailyMinutesDown": {}
   }
