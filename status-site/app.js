@@ -754,7 +754,8 @@ function StHeaderArt({
   const skyByMode = {
     operational: 'linear-gradient(180deg, #0A0F1C 0%, #101A30 70%, #0E2A3E 100%)',
     degraded: 'linear-gradient(180deg, #0F0E1A 0%, #2A2138 70%, #3A2A30 100%)',
-    outage: 'linear-gradient(180deg, #120A1C 0%, #2A1030 70%, #3A1038 100%)'
+    outage: 'linear-gradient(180deg, #120A1C 0%, #2A1030 70%, #3A1038 100%)',
+    unknown: 'linear-gradient(180deg, #111827 0%, #1F2937 70%, #273244 100%)'
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -949,6 +950,13 @@ const ST_STATES = {
     bg: '#F1F5F9',
     border: '#E2E8F0'
   },
+  unknown: {
+    banner: 'Status unknown',
+    sub: 'Automated checks have not reported recently, so this page cannot confirm the current status. This alone does not mean a service is down.',
+    color: '#64748B',
+    bg: '#F1F5F9',
+    border: '#CBD5E1'
+  },
   operational: {
     banner: 'All systems operational',
     sub: 'The lighthouse is lit. Every crossing is clear.',
@@ -978,6 +986,20 @@ const ST_SERVICES = [['aierudit.com', 'Public site, course catalog & landing pag
 
 // Monitoring for this status page began here; earlier days have no data.
 const ST_MONITORING_START = '2026-06-10';
+
+// Data older than this is treated as stale: the page then says "Status
+// unknown" instead of showing green. Uptime CI is scheduled every 5 min but
+// GitHub runs it every ~15-60 min in practice, so 2 h avoids false alarms.
+const ST_STALE_AFTER_MS = 2 * 60 * 60 * 1000;
+function stIsFresh(iso) {
+  const t = iso ? Date.parse(iso) : NaN;
+  return !isNaN(t) && Date.now() - t < ST_STALE_AFTER_MS;
+}
+function stFmtUtc(iso) {
+  const t = iso ? Date.parse(iso) : NaN;
+  if (isNaN(t)) return null;
+  return new Date(t).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+}
 function stStatusToMode(status) {
   if (status === 'down') return 'outage';
   if (status === 'degraded') return 'degraded';
@@ -986,16 +1008,17 @@ function stStatusToMode(status) {
 
 // Build 90 day-bars from a summary entry's real dailyMinutesDown.
 // Days before monitoring began render as honest "no data" (grey).
-function stBuildBars(entry) {
+function stBuildBars(entry, lastCheck) {
   const out = [];
   const start = new Date(ST_MONITORING_START + 'T00:00:00Z');
+  const lastDay = lastCheck && !isNaN(Date.parse(lastCheck)) ? new Date(lastCheck).toISOString().slice(0, 10) : null;
   const today = new Date();
   const dmd = entry && entry.dailyMinutesDown || {};
   for (let i = 0; i < 90; i++) {
     const d = new Date(today);
     d.setUTCDate(d.getUTCDate() - (89 - i));
     const ds = d.toISOString().slice(0, 10);
-    if (d < start) {
+    if (d < start || lastDay && ds > lastDay) {
       out.push('nodata');
       continue;
     }
@@ -1040,10 +1063,10 @@ function StComponentRow({
   const name = service[0],
     desc = service[1],
     mid = service[2];
-  const status = data && data.status || 'up';
-  const affected = status !== 'up';
-  const statusTxt = status === 'down' ? 'Partial outage' : status === 'degraded' ? 'Degraded performance' : 'Operational';
-  const statusColor = status === 'down' ? ST.crit : status === 'degraded' ? ST.warn : ST.ok;
+  const status = !data ? 'unknown' : data.stale ? 'unknown' : data.status || 'unknown';
+  const affected = status === 'down' || status === 'degraded';
+  const statusTxt = status === 'down' ? 'Partial outage' : status === 'degraded' ? 'Degraded performance' : status === 'up' ? 'Operational' : 'Status unknown';
+  const statusColor = status === 'down' ? ST.crit : status === 'degraded' ? ST.warn : status === 'up' ? ST.ok : '#64748B';
   const up = data && data.uptime || '—';
   const bars = data && data.bars || [];
   return /*#__PURE__*/React.createElement("div", {
@@ -1312,8 +1335,10 @@ function stBuildIncidentDays(issues) {
   return days;
 }
 function StatusBanner({
-  mode
+  mode,
+  lastCheck
 }) {
+  const lastTxt = stFmtUtc(lastCheck);
   const s = ST_STATES[mode] || ST_STATES.loading;
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1359,7 +1384,7 @@ function StatusBanner({
       textAlign: 'right',
       flexShrink: 0
     }
-  }, "Updated every few minutes", /*#__PURE__*/React.createElement("br", null), "by automated checks"));
+  }, lastTxt ? "Last automated check" : "Updated every few minutes", /*#__PURE__*/React.createElement("br", null), lastTxt || "by automated checks"));
 }
 function SubscribeRow() {
   return /*#__PURE__*/React.createElement("div", {
@@ -1448,30 +1473,47 @@ function Footer() {
 }
 function App() {
   const [mode, setMode] = React.useState('loading');
+  const [lastCheck, setLastCheck] = React.useState(null);
   const [bySlug, setBySlug] = React.useState({});
   const [days, setDays] = React.useState(stBuildIncidentDays([]));
   React.useEffect(function () {
     // Live status from the same-origin summary.json baked next to this page.
-    fetch('./summary.json', {
-      cache: 'no-store'
-    }).then(function (r) {
-      return r.json();
-    }).then(function (rows) {
+    // ./freshness.json is baked by Custom Site CI: when the page was built and
+    // when Uptime CI last succeeded. Without fresh evidence the page must not
+    // show green, so stale data or a failed load renders "Status unknown".
+    const getJson = function (url) {
+      return fetch(url, {
+        cache: 'no-store'
+      }).then(function (r) {
+        if (!r.ok) throw new Error(url + ' ' + r.status);
+        return r.json();
+      });
+    };
+    Promise.all([getJson('./summary.json'), getJson('./freshness.json').catch(function () {
+      return null;
+    })]).then(function (res) {
+      const rows = res[0],
+        fr = res[1] || {};
+      if (!Array.isArray(rows) || rows.length === 0) throw new Error('empty summary');
+      const last = fr.lastUptimeCheck || null;
+      const fresh = stIsFresh(fr.generatedAt) && stIsFresh(last);
       const map = {};
       let worst = 'operational';
       rows.forEach(function (e) {
         map[e.slug] = {
           status: e.status,
+          stale: !fresh,
           uptime: e.uptime,
-          bars: stBuildBars(e)
+          bars: stBuildBars(e, last)
         };
         const m = stStatusToMode(e.status);
         if (m === 'outage') worst = 'outage';else if (m === 'degraded' && worst !== 'outage') worst = 'degraded';
       });
       setBySlug(map);
-      setMode(worst);
+      setLastCheck(last);
+      setMode(fresh ? worst : 'unknown');
     }).catch(function () {
-      setMode('operational');
+      setMode('unknown');
     });
 
     // Real incidents from GitHub issues (CORS-enabled, graceful fallback).
@@ -1499,7 +1541,8 @@ function App() {
   }, /*#__PURE__*/React.createElement(StHeaderArt, {
     mode: mode === 'loading' ? 'operational' : mode
   }), /*#__PURE__*/React.createElement(StatusBanner, {
-    mode: mode
+    mode: mode,
+    lastCheck: lastCheck
   })), /*#__PURE__*/React.createElement(SubscribeRow, null), /*#__PURE__*/React.createElement("div", {
     style: {
       background: '#fff',
