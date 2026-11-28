@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Website",
+    "url": "https://aierudit.com/",
+    "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
+    "slug": "website",
+    "status": "up",
+    "uptime": "99.97%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "99.97%",
+    "time": 855,
+    "timeDay": 1134,
+    "timeWeek": 939,
+    "timeMonth": 814,
+    "timeYear": 855,
+    "dailyMinutesDown": {
+      "2026-06-23": 68
+    }
+  },
+  {
+    "name": "API",
+    "url": "https://aierudit.com/api/health",
+    "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
+    "slug": "api",
+    "status": "up",
+    "uptime": "100.00%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "100.00%",
+    "time": 475,
+    "timeDay": 465,
+    "timeWeek": 482,
+    "timeMonth": 423,
+    "timeYear": 475,
+    "dailyMinutesDown": {}
+  },
+  {
+    "name": "Checkout & Payments",
+    "url": "https://aierudit.com/api/v1/health/stripe",
+    "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
+    "slug": "checkout-and-payments",
+    "status": "up",
+    "uptime": "99.87%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "99.87%",
+    "time": 356,
+    "timeDay": 497,
+    "timeWeek": 383,
+    "timeMonth": 320,
+    "timeYear": 356,
+    "dailyMinutesDown": {
+      "2026-08-09": 311
+    }
+  },
+  {
+    "name": "Authentication",
+    "url": "https://aierudit.com/api/v1/auth/providers",
+    "icon": "https://icons.duckduckgo.com/ip3/aierudit.com.ico",
+    "slug": "authentication",
+    "status": "up",
+    "uptime": "99.87%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "99.87%",
+    "time": 313,
+    "timeDay": 263,
+    "timeWeek": 305,
+    "timeMonth": 306,
+    "timeYear": 313,
+    "dailyMinutesDown": {
+      "2026-08-09": 311
+    }
+  },
+  {
+    "name": "Email Delivery",
+    "url": "https://api.brevo.com/v3/account",
+    "icon": "https://icons.duckduckgo.com/ip3/api.brevo.com.ico",
+    "slug": "email-delivery",
+    "status": "up",
+    "uptime": "100.00%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "100.00%",
+    "time": 428,
+    "timeDay": 559,
+    "timeWeek": 455,
+    "timeMonth": 421,
+    "timeYear": 428,
+    "dailyMinutesDown": {}
+  }
+]
